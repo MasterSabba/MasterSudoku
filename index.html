@@ -14,25 +14,14 @@
             --text: #f8fafc;
             --grid-line: #64748b;
             --cell-fixed: #94a3b8;
-            --glow: 0 0 15px rgba(56, 189, 248, 0.6);
         }
 
         html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            position: fixed;
-            touch-action: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: 'Inter', 'Segoe UI', sans-serif;
-            user-select: none;
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            overflow: hidden; position: fixed; touch-action: none;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background-color: var(--bg); color: var(--text);
+            font-family: 'Inter', 'Segoe UI', sans-serif; user-select: none;
         }
 
         .close-link {
@@ -40,48 +29,23 @@
             text-decoration: none; color: rgba(255, 255, 255, 0.3); 
             font-size: 26px; padding: 5px; transition: 0.3s;
         }
-        .close-link:hover { color: #fff; transform: scale(1.1); }
 
         .header { margin-bottom: 8px; text-align: center; }
-        h1 { 
-            color: var(--accent); 
-            margin: 0; 
-            font-size: 1.8rem;
-            letter-spacing: 1px;
-            text-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
-        }
+        h1 { color: var(--accent); margin: 0; font-size: 1.8rem; letter-spacing: 1px; }
         #timer { font-family: 'JetBrains Mono', monospace; font-size: 1.2rem; color: #94a3b8; }
 
         .sudoku-grid {
-            display: grid;
-            grid-template-columns: repeat(9, 1fr);
-            background-color: var(--grid-line);
-            border: 4px solid var(--grid-line);
-            border-radius: 10px;
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8);
-            width: 92vw;
-            max-width: 440px;
-            /* GRIGLIA QUADRATA FORZATA */
-            height: auto;
-            max-height: 440px;
-            aspect-ratio: 1 / 1; 
-            margin: 12px 0;
-            overflow: hidden;
+            display: grid; grid-template-columns: repeat(9, 1fr);
+            background-color: var(--grid-line); border: 4px solid var(--grid-line);
+            border-radius: 10px; width: 92vw; max-width: 440px;
+            aspect-ratio: 1 / 1; margin: 12px 0; overflow: hidden;
         }
 
         .cell {
-            background: var(--card-bg);
-            border: 1px solid rgba(255,255,255,0.03);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            /* NUMERI RIMPICCIOLITI */
-            font-size: 1.3rem; 
-            font-weight: 800;
-            cursor: pointer;
-            position: relative;
-            color: #fff;
-            transition: all 0.1s ease-out;
+            background: var(--card-bg); border: 1px solid rgba(255,255,255,0.03);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 1.3rem; font-weight: 800; cursor: pointer;
+            position: relative; color: #fff; transition: background 0.1s;
         }
 
         .cell:nth-child(3n) { border-right: 3px solid var(--grid-line); }
@@ -91,62 +55,41 @@
 
         .cell.fixed { color: var(--cell-fixed); background: rgba(15, 23, 42, 0.6); }
         
+        /* SELEZIONE: Blu scuro pulito */
         .cell.selected { 
             background: #334155 !important; 
             box-shadow: inset 0 0 0 4px var(--accent);
             z-index: 10;
         }
 
-        .cell.same-number { 
-            background: rgba(56, 189, 248, 0.3) !important; 
-            color: #fff;
-            text-shadow: var(--glow);
-        }
+        .cell.same-number { background: rgba(56, 189, 248, 0.3) !important; }
 
+        /* ERRORE: Rosso solido senza LED/Glow per non disturbare la vista */
         .cell.error { 
-            background: rgba(239, 68, 68, 0.2) !important; 
-            color: var(--danger) !important;
-            text-shadow: 0 0 10px var(--danger);
+            background: #7f1d1d !important; /* Rosso scuro solido */
+            color: #ffffff !important;
         }
 
         .notes-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            width: 100%; height: 100%;
-            font-size: 0.55rem; color: var(--accent);
-            padding: 3px;
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            width: 100%; height: 100%; font-size: 0.55rem; color: var(--accent); padding: 3px;
         }
 
         .numpad {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-            width: 92vw;
-            max-width: 440px;
-            margin-top: 8px;
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
+            width: 92vw; max-width: 440px; margin-top: 8px;
         }
 
         .num-btn {
-            background: #1e293b;
-            border: 1px solid #475569;
-            color: var(--text);
-            padding: 14px 0;
-            border-radius: 10px;
-            font-size: 1.4rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
+            background: #1e293b; border: 1px solid #475569; color: var(--text);
+            padding: 14px 0; border-radius: 10px; font-size: 1.4rem;
+            font-weight: bold; cursor: pointer;
         }
-        .num-btn:active { background: var(--accent); color: var(--bg); transform: scale(0.95); }
         
-        .actions {
-            display: flex; gap: 10px; width: 92vw; max-width: 440px; margin-top: 12px;
-        }
-        .actions button {
-            flex: 1; padding: 14px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.9rem;
-        }
+        .actions { display: flex; gap: 10px; width: 92vw; max-width: 440px; margin-top: 12px; }
+        .actions button { flex: 1; padding: 14px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; }
         .btn-matita { background: #334155; color: white; border: 1px solid #475569; }
-        .btn-matita.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+        .btn-matita.active { background: var(--accent); color: var(--bg); }
     </style>
 </head>
 <body>
@@ -184,8 +127,7 @@
     let selectedIdx = 0, noteMode = false, seconds = 0, timerInterval;
 
     function initGame() {
-        clearInterval(timerInterval);
-        seconds = 0;
+        clearInterval(timerInterval); seconds = 0;
         document.getElementById('timer').innerText = "00:00";
         timerInterval = setInterval(() => {
             seconds++;
@@ -193,10 +135,7 @@
             let s = (seconds%60).toString().padStart(2,'0');
             document.getElementById('timer').innerText = `${m}:${s}`;
         }, 1000);
-
-        generateLogic();
-        renderGrid();
-        selectCell(0);
+        generateLogic(); renderGrid(); selectCell(0);
     }
 
     function generateLogic() {
@@ -216,11 +155,8 @@
                 } return false;
             } return true;
         };
-        solve(grid);
-        solution = [...grid];
-        puzzle = [...grid];
-        let rem = 42; 
-        while(rem>0) {
+        solve(grid); solution = [...grid]; puzzle = [...grid];
+        let rem = 42; while(rem>0) {
             let i = Math.floor(Math.random()*81);
             if(puzzle[i]!==0) { puzzle[i]=0; rem--; }
         }
@@ -241,11 +177,8 @@
     }
 
     function selectCell(idx) {
-        if (idx < 0) idx = 80;
-        if (idx >= 81) idx = 0;
-        selectedIdx = idx;
-        const cellVal = puzzle[idx] || 0;
-
+        if (idx < 0) idx = 80; if (idx >= 81) idx = 0;
+        selectedIdx = idx; const cellVal = puzzle[idx] || 0;
         document.querySelectorAll('.cell').forEach((cell, i) => {
             cell.classList.remove('selected', 'same-number');
             if(i === idx) cell.classList.add('selected');
@@ -256,25 +189,18 @@
     function inputNum(n) {
         const cell = document.getElementById(`cell-${selectedIdx}`);
         if(cell.classList.contains('fixed')) return;
-        
         cell.classList.remove('error');
-
         if(n === 0) {
-            puzzle[selectedIdx] = 0;
-            notes[selectedIdx] = [];
-            cell.innerText = '';
+            puzzle[selectedIdx] = 0; notes[selectedIdx] = []; cell.innerText = '';
         } else if(noteMode) {
             puzzle[selectedIdx] = 0;
             let nts = notes[selectedIdx];
             if(nts.includes(n)) nts = nts.filter(x => x !== n);
             else nts.push(n);
-            notes[selectedIdx] = nts;
-            renderNotes(cell, nts);
+            notes[selectedIdx] = nts; renderNotes(cell, nts);
         } else {
-            puzzle[selectedIdx] = n;
-            notes[selectedIdx] = [];
-            cell.innerText = n;
-            cell.style.color = "var(--accent)";
+            puzzle[selectedIdx] = n; notes[selectedIdx] = [];
+            cell.innerText = n; cell.style.color = "var(--accent)";
         }
         selectCell(selectedIdx); 
     }
@@ -284,9 +210,6 @@
         const container = cell.querySelector('.notes-grid');
         for(let i=1; i<=9; i++) {
             const div = document.createElement('div');
-            div.style.display = 'flex';
-            div.style.justifyContent = 'center';
-            div.style.alignItems = 'center';
             div.innerText = nts.includes(i) ? i : '';
             container.appendChild(div);
         }
