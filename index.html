@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MasterSudoku - Zen Edition</title>
+    <style>
+        :root {
+            --bg: #020617;
+            --card-bg: #1e293b;
+            --accent: #38bdf8;
+            --danger: #ef4444;
+            --success: #22c55e;
+            --text: #f8fafc;
+            --grid-line: #64748b;
+            --cell-fixed: #94a3b8;
+            --glow: 0 0 15px rgba(56, 189, 248, 0.6);
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 10px;
+            user-select: none;
+            touch-action: manipulation;
+        }
+
+        .close-link {
+            position: fixed; top: 15px; left: 15px; z-index: 9999; 
+            text-decoration: none; color: rgba(255, 255, 255, 0.3); 
+            font-size: 28px; padding: 5px; transition: 0.3s;
+        }
+        .close-link:hover { color: #fff; transform: scale(1.1); }
+
+        .header { margin-top: 30px; text-align: center; }
+        h1 { 
+            color: var(--accent); 
+            margin: 0; 
+            font-size: 2.2rem; 
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+        }
+        #timer { font-family: 'JetBrains Mono', monospace; font-size: 1.4rem; color: #94a3b8; }
+
+        .sudoku-grid {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            background-color: var(--grid-line);
+            border: 4px solid var(--grid-line);
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            max-width: 480px;
+            width: 100%;
+            aspect-ratio: 1/1;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .cell {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.03);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.7rem;
+            font-weight: 800;
+            cursor: pointer;
+            position: relative;
+            color: #fff;
+            transition: all 0.1s ease-out;
+        }
+
+        /* Divisioni Quadranti 3x3 */
+        .cell:nth-child(3n) { border-right: 3px solid var(--grid-line); }
+        .cell:nth-child(9n) { border-right: none; }
+        .cell:nth-child(n+19):nth-child(-n+27),
+        .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 3px solid var(--grid-line); }
+
+        .cell.fixed { color: var(--cell-fixed); background: rgba(15, 23, 42, 0.6); }
+        
+        .cell.selected { 
+            background: #334155 !important; 
+            box-shadow: inset 0 0 0 4px var(--accent);
+            z-index: 10;
+        }
+
+        /* Effetto Acceso sui numeri uguali */
+        .cell.same-number { 
+            background: rgba(56, 189, 248, 0.3) !important; 
+            color: #fff;
+            text-shadow: var(--glow);
+        }
+
+        .cell.error { 
+            background: rgba(239, 68, 68, 0.2) !important; 
+            color: var(--danger) !important;
+            text-shadow: 0 0 10px var(--danger);
+        }
+
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            width: 100%; height: 100%;
+            font-size: 0.65rem; color: var(--accent);
+            padding: 4px;
+        }
+
+        .numpad {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            width: 100%;
+            max-width: 480px;
+            margin-top: 5px;
+        }
+
+        .num-btn {
+            background: #1e293b;
+            border: 1px solid #475569;
+            color: var(--text);
+            padding: 16px 0;
+            border-radius: 12px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .num-btn:active { background: var(--accent); color: var(--bg); transform: scale(0.95); }
+        
+        .actions {
+            display: flex; gap: 10px; width: 100%; max-width: 480px; margin-top: 15px;
+        }
+        .actions button {
+            flex: 1; padding: 15px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn-matita { background: #334155; color: white; border: 1px solid #475569; }
+        .btn-matita.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+    </style>
+</head>
+<body>
+
+<a href="https://mastersabba.github.io/MasterSabba/" target="_self" class="close-link">✕</a>
+
+<div class="header">
+    <h1>MasterSudoku</h1>
+    <div id="timer">00:00</div>
+</div>
+
+<div class="sudoku-grid" id="grid"></div>
+
+<div class="numpad">
+    <button class="num-btn" onclick="inputNum(1)">1</button>
+    <button class="num-btn" onclick="inputNum(2)">2</button>
+    <button class="num-btn" onclick="inputNum(3)">3</button>
+    <button class="num-btn" onclick="inputNum(4)">4</button>
+    <button class="num-btn" onclick="inputNum(5)">5</button>
+    <button class="num-btn" onclick="inputNum(6)">6</button>
+    <button class="num-btn" onclick="inputNum(7)">7</button>
+    <button class="num-btn" onclick="inputNum(8)">8</button>
+    <button class="num-btn" onclick="inputNum(9)">9</button>
+    <button class="num-btn" onclick="inputNum(0)" style="color: var(--danger)">✖</button>
+</div>
+
+<div class="actions">
+    <button id="btn-note" class="btn-matita" onclick="toggleNoteMode()">Matita: Off</button>
+    <button onclick="checkWin()" style="background: var(--accent); color: var(--bg);">Verifica</button>
+    <button onclick="initGame()" style="background: var(--success); color: var(--bg);">Nuovo</button>
+</div>
+
+<script>
+    let solution = [], puzzle = [], notes = Array(81).fill().map(() => []);
+    let selectedIdx = 0, noteMode = false, seconds = 0, timerInterval;
+
+    function initGame() {
+        clearInterval(timerInterval);
+        seconds = 0;
+        document.getElementById('timer').innerText = "00:00";
+        timerInterval = setInterval(() => {
+            seconds++;
+            let m = Math.floor(seconds/60).toString().padStart(2,'0');
+            let s = (seconds%60).toString().padStart(2,'0');
+            document.getElementById('timer').innerText = `${m}:${s}`;
+        }, 1000);
+
+        generateLogic();
+        renderGrid();
+        selectCell(0);
+    }
+
+    function generateLogic() {
+        let grid = Array(81).fill(0);
+        const isValid = (g, p, n) => {
+            let r = Math.floor(p/9), c = p%9;
+            for(let i=0; i<9; i++) if(g[r*9+i]===n || g[i*9+c]===n) return false;
+            let sr = Math.floor(r/3)*3, sc = Math.floor(c/3)*3;
+            for(let i=0; i<3; i++) for(let j=0; j<3; j++) if(g[(sr+i)*9+sc+j]===n) return false;
+            return true;
+        };
+        const solve = (g) => {
+            for(let i=0; i<81; i++) if(g[i]===0) {
+                let nums = [1,2,3,4,5,6,7,8,9].sort(()=>Math.random()-0.5);
+                for(let n of nums) if(isValid(g,i,n)) {
+                    g[i]=n; if(solve(g)) return true; g[i]=0;
+                } return false;
+            } return true;
+        };
+        solve(grid);
+        solution = [...grid];
+        puzzle = [...grid];
+        let rem = 42; 
+        while(rem>0) {
+            let i = Math.floor(Math.random()*81);
+            if(puzzle[i]!==0) { puzzle[i]=0; rem--; }
+        }
+        notes = Array(81).fill().map(() => []);
+    }
+
+    function renderGrid() {
+        const gridDiv = document.getElementById('grid');
+        gridDiv.innerHTML = '';
+        puzzle.forEach((val, i) => {
+            const cell = document.createElement('div');
+            cell.className = 'cell' + (val !== 0 ? ' fixed' : '');
+            cell.id = `cell-${i}`;
+            if(val !== 0) cell.innerText = val;
+            cell.onclick = () => selectCell(i);
+            gridDiv.appendChild(cell);
+        });
+    }
+
+    function selectCell(idx) {
+        if (idx < 0) idx = 80;
+        if (idx >= 81) idx = 0;
+        selectedIdx = idx;
+        const cellVal = puzzle[idx] || 0;
+
+        document.querySelectorAll('.cell').forEach((cell, i) => {
+            cell.classList.remove('selected', 'same-number');
+            if(i === idx) cell.classList.add('selected');
+            if(cellVal !== 0 && puzzle[i] === cellVal) cell.classList.add('same-number');
+        });
+    }
+
+    function inputNum(n) {
+        const cell = document.getElementById(`cell-${selectedIdx}`);
+        if(cell.classList.contains('fixed')) return;
+        
+        cell.classList.remove('error');
+
+        if(n === 0) {
+            puzzle[selectedIdx] = 0;
+            notes[selectedIdx] = [];
+            cell.innerText = '';
+        } else if(noteMode) {
+            puzzle[selectedIdx] = 0;
+            let nts = notes[selectedIdx];
+            if(nts.includes(n)) nts = nts.filter(x => x !== n);
+            else nts.push(n);
+            notes[selectedIdx] = nts;
+            renderNotes(cell, nts);
+        } else {
+            puzzle[selectedIdx] = n;
+            notes[selectedIdx] = [];
+            cell.innerText = n;
+            cell.style.color = "var(--accent)";
+        }
+        selectCell(selectedIdx); 
+    }
+
+    function renderNotes(cell, nts) {
+        cell.innerHTML = '<div class="notes-grid"></div>';
+        const container = cell.querySelector('.notes-grid');
+        for(let i=1; i<=9; i++) {
+            const div = document.createElement('div');
+            div.style.display = 'flex';
+            div.style.justifyContent = 'center';
+            div.style.alignItems = 'center';
+            div.innerText = nts.includes(i) ? i : '';
+            container.appendChild(div);
+        }
+    }
+
+    function toggleNoteMode() {
+        noteMode = !noteMode;
+        const btn = document.getElementById('btn-note');
+        btn.innerText = noteMode ? "Matita: On" : "Matita: Off";
+        btn.classList.toggle('active', noteMode);
+    }
+
+    function checkWin() {
+        let win = true;
+        puzzle.forEach((val, i) => {
+            const cell = document.getElementById(`cell-${i}`);
+            if(val !== 0) {
+                if(val !== solution[i]) { cell.classList.add('error'); win = false; }
+            } else { win = false; }
+        });
+        if(win) { clearInterval(timerInterval); alert("MASTER! Tempo: " + document.getElementById('timer').innerText); }
+    }
+
+    // SUPPORTO TASTIERA
+    document.addEventListener('keydown', (e) => {
+        if(e.key >= 1 && e.key <= 9) inputNum(parseInt(e.key));
+        if(e.key === 'Backspace' || e.key === '0' || e.key === 'Delete') inputNum(0);
+        if(e.key === 'ArrowUp') { e.preventDefault(); selectCell(selectedIdx - 9); }
+        if(e.key === 'ArrowDown') { e.preventDefault(); selectCell(selectedIdx + 9); }
+        if(e.key === 'ArrowLeft') { e.preventDefault(); selectCell(selectedIdx - 1); }
+        if(e.key === 'ArrowRight') { e.preventDefault(); selectCell(selectedIdx + 1); }
+        if(e.key.toLowerCase() === 'n') toggleNoteMode();
+        if(e.key === 'Enter') checkWin();
+    });
+
+    initGame();
+</script>
+</body>
+</html>
