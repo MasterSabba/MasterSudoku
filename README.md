@@ -12,6 +12,6 @@ Il gioco include:
 - Numpad dinamico con tasti disabilitati quando il numero è completato
 - Esperienza responsive e ottimizzata per mobile
 
-È collegato alla repository centrale MasterHub (https://mastersabba.github.io/MasterSabba/), piena di altri minigame.
+È collegato alla repository centrale MasterGames (https://mastersabba.github.io/MasterSabba/), piena di altri minigame.
 
 ![Immagine](IMG_9426.jpeg)
