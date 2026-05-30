@@ -81,13 +81,12 @@
         .num-btn {
             background: #1e293b; border: 1px solid #475569; color: var(--text);
             padding: 14px 0; border-radius: 10px; font-size: 1.4rem;
-            font-weight: bold; cursor: pointer; transition: opacity 0.3s; /* Aggiunta transizione */
+            font-weight: bold; cursor: pointer; transition: opacity 0.3s;
         }
         
-        /* Nuova classe per il numero completato */
         .num-btn.completed {
-            opacity: 0.15; /* Trasparente */
-            pointer-events: none; /* Non cliccabile */
+            opacity: 0.15;
+            pointer-events: none;
         }
 
         .actions { display: flex; gap: 10px; width: 92vw; max-width: 440px; margin-top: 12px; }
@@ -102,7 +101,10 @@
 
 <div class="header">
     <h1>MASTER SUDOKU</h1>
-    <div id="timer">00:00</div>
+    <div style="display: flex; justify-content: center; gap: 20px; align-items: center; margin-top: 4px;">
+        <div id="timer">00:00</div>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; color: var(--success); font-weight: bold;">💎 <span id="pts">0</span></div>
+    </div>
 </div>
 
 <div class="sudoku-grid" id="grid"></div>
@@ -129,9 +131,15 @@
 <script>
     let solution = [], puzzle = [], notes = Array(81).fill().map(() => []);
     let selectedIdx = 0, noteMode = false, seconds = 0, timerInterval;
+    
+    // --- LOGICA SALVATAGGIO PUNTI ---
+    let score = parseInt(localStorage.getItem('ms_score')) || 0;
+    localStorage.setItem('points_mastersudoku', score); // Sincronizza l'Hub all'avvio
+    document.getElementById('pts').innerText = score;
+    let hasWon = false;
 
     function initGame() {
-        clearInterval(timerInterval); seconds = 0;
+        clearInterval(timerInterval); seconds = 0; hasWon = false;
         document.getElementById('timer').innerText = "00:00";
         timerInterval = setInterval(() => {
             seconds++;
@@ -178,7 +186,7 @@
             cell.onclick = () => selectCell(i);
             gridDiv.appendChild(cell);
         });
-        updateNumpadStatus(); // Aggiorna lo stato all'avvio
+        updateNumpadStatus();
     }
 
     function selectCell(idx) {
@@ -191,10 +199,8 @@
         });
     }
 
-    // Nuova funzione per gestire la trasparenza dei tasti completati
     function updateNumpadStatus() {
         const counts = Array(10).fill(0);
-        // Conta quante volte ogni numero è presente nella griglia (puzzle)
         puzzle.forEach(val => {
             if (val !== 0) counts[val]++;
         });
@@ -202,7 +208,6 @@
         const buttons = document.querySelectorAll('.num-btn');
         buttons.forEach(btn => {
             const n = parseInt(btn.innerText);
-            // Se è un numero da 1 a 9 e appare 9 o più volte
             if (n >= 1 && n <= 9) {
                 if (counts[n] >= 9) {
                     btn.classList.add('completed');
@@ -216,7 +221,7 @@
     function inputNum(n) {
         const cell = document.getElementById(`cell-${selectedIdx}`);
         if(cell.classList.contains('fixed')) return;
-        cell.classList.remove('error'); // Rimuove l'errore se si cambia numero
+        cell.classList.remove('error');
         if(n === 0) {
             puzzle[selectedIdx] = 0; notes[selectedIdx] = []; cell.innerText = '';
         } else if(noteMode) {
@@ -228,10 +233,9 @@
         } else {
             puzzle[selectedIdx] = n; notes[selectedIdx] = [];
             cell.innerText = n; cell.style.color = "var(--accent)";
-            // CODICE ORIGINALE RIPRISTINATO: nessuna verifica immediata dell'errore qui
         }
         selectCell(selectedIdx);
-        updateNumpadStatus(); // Aggiorna lo stato dei tasti dopo l'inserimento
+        updateNumpadStatus();
     }
 
     function renderNotes(cell, nts) {
@@ -259,7 +263,20 @@
                 if(val !== solution[i]) { cell.classList.add('error'); win = false; }
             } else { win = false; }
         });
-        if(win) { clearInterval(timerInterval); alert("MASTER! Tempo: " + document.getElementById('timer').innerText); }
+        
+        if(win) { 
+            clearInterval(timerInterval); 
+            
+            // ASSEGNAZIONE PUNTI VITTORIA
+            if (!hasWon) {
+                hasWon = true;
+                score += 100;
+                localStorage.setItem('ms_score', score);
+                localStorage.setItem('points_mastersudoku', score);
+                document.getElementById('pts').innerText = score;
+            }
+            alert("MASTER! Tempo: " + document.getElementById('timer').innerText + "\n+100 💎 salvati nell'Hub!"); 
+        }
     }
 
     document.addEventListener('keydown', (e) => {
