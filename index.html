@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MASTER SUDOKU</title>
+    <title>MASTER SUDOKU - Zen Edition</title>
     <style>
         :root {
             --bg: #020617;
@@ -97,7 +97,7 @@
 </head>
 <body>
 
-    <a href="#" onclick="window.close(); return false;" class="exit-button" title="Torna all'Hub">×</a>
+<a href="https://mastersabba.github.io/MasterSabba/" target="_self" class="close-link">✕</a>
 
 <div class="header">
     <h1>MASTER SUDOKU</h1>
@@ -133,9 +133,8 @@
     let selectedIdx = 0, noteMode = false, seconds = 0, timerInterval;
     
     // --- LOGICA SALVATAGGIO PUNTI ---
-    let score = parseInt(localStorage.getItem('points_mastersudoku')) || parseInt(localStorage.getItem('ms_score')) || 0;
-    localStorage.setItem('points_mastersudoku', score);
-    localStorage.setItem('ms_score', score);
+    let score = parseInt(localStorage.getItem('ms_score')) || 0;
+    localStorage.setItem('points_mastersudoku', score); // Sincronizza l'Hub all'avvio
     document.getElementById('pts').innerText = score;
     let hasWon = false;
 
@@ -268,25 +267,15 @@
         if(win) { 
             clearInterval(timerInterval); 
             
+            // ASSEGNAZIONE PUNTI VITTORIA
             if (!hasWon) {
                 hasWon = true;
-                const timeBonus = Math.max(0, 300 - seconds);
-                const pointsGained = 100 + Math.floor(timeBonus / 5);
-                score += pointsGained;
-
+                score += 100;
                 localStorage.setItem('ms_score', score);
                 localStorage.setItem('points_mastersudoku', score);
-
-                let winsSudoku = parseInt(localStorage.getItem("wins_mastersudoku")) || 0;
-                localStorage.setItem("wins_mastersudoku", winsSudoku + 1);
-
                 document.getElementById('pts').innerText = score;
-
-                const winMsg = { type: 'GAME_WIN', gameKey: 'master-sudoku', points: pointsGained };
-                if (window.opener) window.opener.postMessage(winMsg, '*');
-                if (window.parent && window.parent !== window) window.parent.postMessage(winMsg, '*');
             }
-            alert("MASTER! Tempo: " + document.getElementById('timer').innerText + "\n+" + (100 + Math.floor(Math.max(0, 300 - seconds) / 5)) + " 💎 salvati nell'Hub!"); 
+            alert("MASTER! Tempo: " + document.getElementById('timer').innerText + "\n+100 💎 salvati nell'Hub!"); 
         }
     }
 
