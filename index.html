@@ -93,11 +93,18 @@
         .actions button { flex: 1; padding: 14px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; }
         .btn-matita { background: #334155; color: white; border: 1px solid #475569; }
         .btn-matita.active { background: var(--accent); color: var(--bg); }
+    
+        .exit-button {
+                position: absolute; top: 15px; left: 20px; font-size: 2rem; line-height: 1;
+                color: var(--empty-border); text-decoration: none; z-index: 100;
+                transition: all 0.2s ease; -webkit-tap-highlight-color: transparent; font-family: Arial, sans-serif;
+            }
+            .exit-button:hover { color: var(--text-color); transform: scale(1.1); }
     </style>
 </head>
 <body>
 
-<a href="https://mastersabba.github.io/MasterSabba/" target="_self" class="close-link">✕</a>
+    <a href="#" onclick="window.close(); return false;" class="exit-button" title="Torna all'Hub">×</a>
 
 <div class="header">
     <h1>MASTER SUDOKU</h1>
@@ -256,28 +263,36 @@
     }
 
     function checkWin() {
-        let win = true;
-        puzzle.forEach((val, i) => {
-            const cell = document.getElementById(`cell-${i}`);
-            if(val !== 0) {
-                if(val !== solution[i]) { cell.classList.add('error'); win = false; }
-            } else { win = false; }
-        });
+    let win = true;
+    puzzle.forEach((val, i) => {
+        const cell = document.getElementById(`cell-${i}`);
+        if(val !== 0) {
+            if(val !== solution[i]) { cell.classList.add('error'); win = false; }
+        } else { win = false; }
+    });
+    
+    if(win) { 
+        clearInterval(timerInterval); 
         
-        if(win) { 
-            clearInterval(timerInterval); 
-            
-            // ASSEGNAZIONE PUNTI VITTORIA
-            if (!hasWon) {
-                hasWon = true;
-                score += 100;
-                localStorage.setItem('ms_score', score);
-                localStorage.setItem('points_mastersudoku', score);
-                document.getElementById('pts').innerText = score;
+        if (!hasWon) {
+            hasWon = true;
+            score += 100;
+            localStorage.setItem('ms_score', score);
+            localStorage.setItem('points_mastersudoku', score);
+            document.getElementById('pts').innerText = score;
+
+            // Invio notifica di vittoria all'Hub
+            if (window.parent) {
+                window.parent.postMessage({
+                    type: 'GAME_WIN',
+                    gameKey: 'master-sudoku',
+                    points: 100
+                }, '*');
             }
-            alert("MASTER! Tempo: " + document.getElementById('timer').innerText + "\n+100 💎 salvati nell'Hub!"); 
         }
+        alert("MASTER! Tempo: " + document.getElementById('timer').innerText + "\n+100 💎 salvati nell'Hub!"); 
     }
+}
 
     document.addEventListener('keydown', (e) => {
         if(e.key >= 1 && e.key <= 9) inputNum(parseInt(e.key));
