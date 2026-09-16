@@ -277,20 +277,17 @@
         if (!hasWon) {
             hasWon = true;
             score += 100;
-            localStorage.setItem('ms_score', score);
-            localStorage.setItem('points_mastersudoku', score);
-            document.getElementById('pts').innerText = score;
-
-            // Invio notifica di vittoria all'Hub
-            if (window.parent) {
+            
+            // Invia i punti all'Hub genitore che ospita l'iframe
+            if (window.parent && window.parent !== window) {
                 window.parent.postMessage({
                     type: 'GAME_WIN',
                     gameKey: 'master-sudoku',
                     points: 100
-                }, '*');
+                }, '*'); // Puoi sostituire '*' con l'URL dell'Hub se vuoi più sicurezza (es: 'https://tuo-hub.github.io')
             }
         }
-        alert("MASTER! Tempo: " + document.getElementById('timer').innerText + "\n+100 💎 salvati nell'Hub!"); 
+        alert("MASTER! Tempo: " + document.getElementById('timer').innerText + "\n+100 💎 salvati!"); 
     }
 }
 
