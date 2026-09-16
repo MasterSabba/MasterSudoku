@@ -134,7 +134,7 @@
     
     // --- LOGICA SALVATAGGIO PUNTI ---
     let score = parseInt(localStorage.getItem('ms_score')) || 0;
-    localStorage.setItem('points_mastersudoku', score); // Sincronizza l'Hub all'avvio
+    localStorage.setItem('points_mastersudoku', score);
     document.getElementById('pts').innerText = score;
     let hasWon = false;
 
@@ -267,13 +267,26 @@
         if(win) { 
             clearInterval(timerInterval); 
             
-            // ASSEGNAZIONE PUNTI VITTORIA
+            // ASSEGNAZIONE PUNTI VITTORIA E SINCRONIZZAZIONE HUB
             if (!hasWon) {
                 hasWon = true;
-                score += 100;
+                const pointsGained = 100;
+                score += pointsGained;
+
+                // Salvataggio nel LocalStorage
                 localStorage.setItem('ms_score', score);
                 localStorage.setItem('points_mastersudoku', score);
+
+                let winsSudoku = parseInt(localStorage.getItem("wins_mastersudoku")) || 0;
+                localStorage.setItem("wins_mastersudoku", winsSudoku + 1);
+
+                // Aggiornamento interfaccia locale
                 document.getElementById('pts').innerText = score;
+
+                // Invio messaggi di sincronizzazione all'Hub principale
+                const winMsg = { type: 'GAME_WIN', gameKey: 'master-sudoku', points: pointsGained };
+                if (window.opener) window.opener.postMessage(winMsg, '*');
+                if (window.parent && window.parent !== window) window.parent.postMessage(winMsg, '*');
             }
             alert("MASTER! Tempo: " + document.getElementById('timer').innerText + "\n+100 💎 salvati nell'Hub!"); 
         }
