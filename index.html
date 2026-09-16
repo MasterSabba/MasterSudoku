@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MASTER SUDOKU - Zen Edition</title>
+    <title>MASTER SUDOKU</title>
     <style>
         :root {
             --bg: #020617;
@@ -133,8 +133,9 @@
     let selectedIdx = 0, noteMode = false, seconds = 0, timerInterval;
     
     // --- LOGICA SALVATAGGIO PUNTI ---
-    let score = parseInt(localStorage.getItem('ms_score')) || 0;
+    let score = parseInt(localStorage.getItem('points_mastersudoku')) || parseInt(localStorage.getItem('ms_score')) || 0;
     localStorage.setItem('points_mastersudoku', score);
+    localStorage.setItem('ms_score', score);
     document.getElementById('pts').innerText = score;
     let hasWon = false;
 
@@ -267,28 +268,25 @@
         if(win) { 
             clearInterval(timerInterval); 
             
-            // ASSEGNAZIONE PUNTI VITTORIA E SINCRONIZZAZIONE HUB
             if (!hasWon) {
                 hasWon = true;
-                const pointsGained = 100;
+                const timeBonus = Math.max(0, 300 - seconds);
+                const pointsGained = 100 + Math.floor(timeBonus / 5);
                 score += pointsGained;
 
-                // Salvataggio nel LocalStorage
                 localStorage.setItem('ms_score', score);
                 localStorage.setItem('points_mastersudoku', score);
 
                 let winsSudoku = parseInt(localStorage.getItem("wins_mastersudoku")) || 0;
                 localStorage.setItem("wins_mastersudoku", winsSudoku + 1);
 
-                // Aggiornamento interfaccia locale
                 document.getElementById('pts').innerText = score;
 
-                // Invio messaggi di sincronizzazione all'Hub principale
                 const winMsg = { type: 'GAME_WIN', gameKey: 'master-sudoku', points: pointsGained };
                 if (window.opener) window.opener.postMessage(winMsg, '*');
                 if (window.parent && window.parent !== window) window.parent.postMessage(winMsg, '*');
             }
-            alert("MASTER! Tempo: " + document.getElementById('timer').innerText + "\n+100 💎 salvati nell'Hub!"); 
+            alert("MASTER! Tempo: " + document.getElementById('timer').innerText + "\n+" + (100 + Math.floor(Math.max(0, 300 - seconds) / 5)) + " 💎 salvati nell'Hub!"); 
         }
     }
 
