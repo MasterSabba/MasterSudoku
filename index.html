@@ -303,6 +303,22 @@
     });
 
     initGame();
+    function triggerGameWin(gameKey, pointsGained) {
+    // 1. Invio messaggio via postMessage all'Hub (se aperto in popup o iframe)
+    const winMsg = { 
+        type: 'GAME_WIN', 
+        gameKey: gameKey, // es. 'master-sudoku', 'color-storm', ecc.
+        points: pointsGained 
+    };
+
+    if (window.opener) window.opener.postMessage(winMsg, '*');
+    if (window.parent && window.parent !== window) window.parent.postMessage(winMsg, '*');
+
+    // 2. Salvataggio e aggiornamento punti in LocalStorage
+    const storageKey = `points_${gameKey.replace('-', '')}`;
+    const currentPoints = parseInt(localStorage.getItem(storageKey) || '0', 10);
+    localStorage.setItem(storageKey, currentPoints + pointsGained);
+}
 </script>
 </body>
 </html>
