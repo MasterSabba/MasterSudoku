@@ -278,14 +278,22 @@
             hasWon = true;
             score += 100;
             
+            // Aggiorna localStorage per il gioco
+            localStorage.setItem('points_mastersudoku', score);
+            document.getElementById('pts').innerText = score;
+            
+            let winsSudoku = parseInt(localStorage.getItem("wins_mastersudoku")) || 0;
+            localStorage.setItem("wins_mastersudoku", winsSudoku + 1);
+            
             // Invia i punti all'Hub genitore che ospita l'iframe
-            if (window.parent && window.parent !== window) {
-                window.parent.postMessage({
-                    type: 'GAME_WIN',
-                    gameKey: 'master-sudoku',
-                    points: 100
-                }, '*'); // Puoi sostituire '*' con l'URL dell'Hub se vuoi più sicurezza (es: 'https://tuo-hub.github.io')
-            }
+            const winMsg = {
+                type: 'GAME_WIN',
+                gameKey: 'master-sudoku',
+                points: 100
+            };
+            
+            if (window.opener) window.opener.postMessage(winMsg, '*');
+            if (window.parent && window.parent !== window) window.parent.postMessage(winMsg, '*');
         }
         alert("MASTER! Tempo: " + document.getElementById('timer').innerText + "\n+100 💎 salvati!"); 
     }
