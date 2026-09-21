@@ -94,12 +94,17 @@
         .actions button { flex: 1; padding: 14px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; }
         .btn-matita { background: #334155; color: white; border: 1px solid #475569; }
         .btn-matita.active { background: var(--accent); color: var(--bg); }
+     .exit-button {
+            position: absolute; top: 15px; left: 20px; font-size: 2rem; line-height: 1;
+            color: var(--empty-border); text-decoration: none; z-index: 100;
+            transition: all 0.2s ease; -webkit-tap-highlight-color: transparent; font-family: Arial, sans-serif;
+        }
+        .exit-button:hover { color: var(--text-color); transform: scale(1.1); }
     </style>
 </head>
 <body>
 
-    <a href="https://mastersabba.github.io/MasterSabba/" target="_self" class="exit-button" title="Torna all'Hub">✕</a>
-
+    <a href="#" onclick="window.close(); return false;" class="exit-button" title="Torna all'Hub">×</a>
     <div class="header">
         <h1>MASTER SUDOKU</h1>
         <div style="display: flex; justify-content: center; gap: 20px; align-items: center; margin-top: 4px;">
