@@ -160,11 +160,15 @@
             }
         }
 
-        function triggerGameWin(gameKey, pointsGained) {
-            const winMsg = { type: 'GAME_WIN', gameKey: gameKey, points: pointsGained };
-            if (window.opener) window.opener.postMessage(winMsg, '*');
-            if (window.parent && window.parent !== window) window.parent.postMessage(winMsg, '*');
-        }
+       function triggerGameWin(gameKey, pointsGained) {
+    const target = window.opener || (window.parent !== window ? window.parent : null);
+    if (target) {
+        target.postMessage({
+            gameKey: gameKey,
+            points: pointsGained
+        }, '*');
+    }
+}
 
         function initGame() {
             clearInterval(timerInterval); seconds = 0; hasWon = false;
