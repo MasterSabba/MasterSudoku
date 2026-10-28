@@ -31,22 +31,38 @@
         }
         .exit-button:hover { color: #fff; transform: scale(1.1); }
 
-        .header { margin-bottom: 8px; text-align: center; }
+        .header { margin-bottom: 6px; text-align: center; }
         h1 { color: var(--accent); margin: 0; font-size: 1.8rem; letter-spacing: 1px; }
-        #timer { font-family: monospace; font-size: 1.2rem; color: #94a3b8; }
+        
+        /* Modalità Difficoltà Pulsanti */
+        .diff-selector {
+            display: flex; gap: 8px; justify-content: center; margin: 8px 0;
+            width: 92vw; max-width: 440px;
+        }
+        .btn-diff {
+            flex: 1; padding: 8px 0; background: #1e293b; border: 1px solid #475569;
+            color: var(--text); border-radius: 8px; font-size: 0.8rem; font-weight: bold;
+            cursor: pointer; text-transform: uppercase; transition: all 0.2s;
+        }
+        .btn-diff.active {
+            background: var(--accent); color: var(--bg); border-color: var(--accent);
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+        }
+
+        #timer { font-family: monospace; font-size: 1.1rem; color: #94a3b8; }
 
         .sudoku-grid {
             display: grid; grid-template-columns: repeat(9, 1fr);
             background-color: var(--grid-line); border: 4px solid var(--grid-line);
             border-radius: 10px; width: 92vw; max-width: 440px;
-            aspect-ratio: 1 / 1; margin: 12px 0; overflow: hidden;
+            aspect-ratio: 1 / 1; margin: 8px 0; overflow: hidden;
         }
 
         .cell {
             background: var(--card-bg); border: 1px solid rgba(255,255,255,0.03);
             display: flex; justify-content: center; align-items: center;
             font-size: 1.3rem; font-weight: 800; cursor: pointer;
-            position: relative; color: #fff; transition: background 0.1s;
+            position: relative; color: #fff; transition: background 0.15s;
         }
 
         .cell:nth-child(3n) { border-right: 3px solid var(--grid-line); }
@@ -55,10 +71,10 @@
         .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 3px solid var(--grid-line); }
 
         .cell.fixed { color: var(--cell-fixed); background: rgba(15, 23, 42, 0.6); }
-        
+
         .cell.selected { 
             background: #334155 !important; 
-            box-shadow: inset 0 0 0 4px var(--accent);
+            box-shadow: inset 0 0 0 3px var(--accent);
             z-index: 10;
         }
 
@@ -76,13 +92,13 @@
 
         .numpad {
             display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
-            width: 92vw; max-width: 440px; margin-top: 8px;
+            width: 92vw; max-width: 440px; margin-top: 6px;
         }
 
         .num-btn {
             background: #1e293b; border: 1px solid #475569; color: var(--text);
-            padding: 14px 0; border-radius: 10px; font-size: 1.4rem;
-            font-weight: bold; cursor: pointer; transition: opacity 0.3s;
+            padding: 12px 0; border-radius: 10px; font-size: 1.3rem;
+            font-weight: bold; cursor: pointer; transition: opacity 0.3s, background 0.15s;
         }
         
         .num-btn.completed {
@@ -90,27 +106,49 @@
             pointer-events: none;
         }
 
-        .actions { display: flex; gap: 10px; width: 92vw; max-width: 440px; margin-top: 12px; }
-        .actions button { flex: 1; padding: 14px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; }
+        .actions { display: flex; gap: 10px; width: 92vw; max-width: 440px; margin-top: 10px; }
+        .actions button { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.85rem; }
         .btn-matita { background: #334155; color: white; border: 1px solid #475569; }
         .btn-matita.active { background: var(--accent); color: var(--bg); }
-     .exit-button {
-            position: absolute; top: 15px; left: 20px; font-size: 2rem; line-height: 1;
-            color: var(--empty-border); text-decoration: none; z-index: 100;
-            transition: all 0.2s ease; -webkit-tap-highlight-color: transparent; font-family: Arial, sans-serif;
+
+        /* Pop-up di Vittoria */
+        #win-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(2, 6, 23, 0.92); display: flex; flex-direction: column;
+            align-items: center; justify-content: center; z-index: 1000;
+            backdrop-filter: blur(5px); transition: all 0.3s ease;
         }
-        .exit-button:hover { color: var(--text-color); transform: scale(1.1); }
+        .modal-content {
+            background: #1e293b; padding: 30px; border-radius: 20px; text-align: center;
+            border: 2px solid var(--accent); box-shadow: 0 0 30px rgba(56, 189, 248, 0.3);
+            max-width: 320px; width: 80%;
+        }
+        .modal-content h2 { color: var(--success); margin: 0 0 10px 0; font-size: 2rem; }
+        .modal-content p { margin: 10px 0; font-size: 1rem; color: var(--text); }
+        .modal-content button {
+            margin-top: 15px; width: 100%; padding: 12px; background: var(--accent);
+            border: none; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; color: var(--bg);
+        }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
     <a href="#" onclick="window.close(); return false;" class="exit-button" title="Torna all'Hub">×</a>
+    
     <div class="header">
         <h1>MASTER SUDOKU</h1>
         <div style="display: flex; justify-content: center; gap: 20px; align-items: center; margin-top: 4px;">
             <div id="timer">00:00</div>
             <div style="font-family: monospace; font-size: 1.1rem; color: var(--success); font-weight: bold;">💎 <span id="pts">0</span></div>
         </div>
+    </div>
+
+    <!-- SELETTORE DIFFICOLTÀ -->
+    <div class="diff-selector">
+        <button class="btn-diff active" onclick="setDifficulty('easy', this)">Facile</button>
+        <button class="btn-diff" onclick="setDifficulty('medium', this)">Media</button>
+        <button class="btn-diff" onclick="setDifficulty('hard', this)">Difficile</button>
     </div>
 
     <div class="sudoku-grid" id="grid"></div>
@@ -134,16 +172,34 @@
         <button onclick="initGame()" style="background: var(--success); color: var(--bg);">Nuovo</button>
     </div>
 
+    <!-- MODALE VITTORIA -->
+    <div id="win-modal" class="hidden">
+        <div class="modal-content">
+            <h2>🎉 VITTORIA!</h2>
+            <p id="win-time">Tempo: 00:00</p>
+            <p id="win-bonus" style="color: var(--success); font-weight: bold;">+500 💎 salvati!</p>
+            <button onclick="closeWinModal()">GIOCA ANCORA</button>
+        </div>
+    </div>
+
     <script>
-        let solution = [], puzzle = [], notes = Array(81).fill().map(() => []);
+        let puzzle = [], notes = Array(81).fill().map(() => []);
         let selectedIdx = 0, noteMode = false, seconds = 0, timerInterval;
+        let currentDifficulty = 'easy';
         let userNick = localStorage.getItem('nickname') || localStorage.getItem('username') || "Player";
         
-        let score = parseInt(localStorage.getItem('_mastersudoku')) || parseInt(localStorage.getItem('ms_score')) || 0;
+        let score = parseInt(localStorage.getItem('points_mastersudoku')) || parseInt(localStorage.getItem('ms_score')) || 0;
         localStorage.setItem('points_mastersudoku', score);
         localStorage.setItem('ms_score', score);
         document.getElementById('pts').innerText = score;
         let hasWon = false;
+
+        function setDifficulty(diff, btn) {
+            currentDifficulty = diff;
+            document.querySelectorAll('.btn-diff').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            initGame();
+        }
 
         async function savePoints(newScore) {
             score = newScore;
@@ -160,18 +216,19 @@
             }
         }
 
-       function triggerGameWin(gameKey, pointsGained) {
-    const target = window.opener || (window.parent !== window ? window.parent : null);
-    if (target) {
-        target.postMessage({
-            gameKey: gameKey,
-            points: pointsGained
-        }, '*');
-    }
-}
+        function triggerGameWin(gameKey, pointsGained) {
+            const target = window.opener || (window.parent !== window ? window.parent : null);
+            if (target) {
+                target.postMessage({
+                    gameKey: gameKey,
+                    points: pointsGained
+                }, '*');
+            }
+        }
 
         function initGame() {
             clearInterval(timerInterval); seconds = 0; hasWon = false;
+            document.getElementById('win-modal').classList.add('hidden');
             document.getElementById('timer').innerText = "00:00";
             timerInterval = setInterval(() => {
                 seconds++;
@@ -199,10 +256,15 @@
                     } return false;
                 } return true;
             };
-            solve(grid); solution = [...grid]; puzzle = [...grid];
-            let rem = 42; while(rem>0) {
+            solve(grid); puzzle = [...grid];
+
+            let rem = 32;
+            if (currentDifficulty === 'medium') rem = 44;
+            if (currentDifficulty === 'hard') rem = 54;
+
+            while(rem > 0) {
                 let i = Math.floor(Math.random()*81);
-                if(puzzle[i]!==0) { puzzle[i]=0; rem--; }
+                if(puzzle[i] !== 0) { puzzle[i] = 0; rem--; }
             }
             notes = Array(81).fill().map(() => []);
         }
@@ -224,6 +286,7 @@
         function selectCell(idx) {
             if (idx < 0) idx = 80; if (idx >= 81) idx = 0;
             selectedIdx = idx; const cellVal = puzzle[idx] || 0;
+
             document.querySelectorAll('.cell').forEach((cell, i) => {
                 cell.classList.remove('selected', 'same-number');
                 if(i === idx) cell.classList.add('selected');
@@ -281,26 +344,68 @@
             btn.classList.toggle('active', noteMode);
         }
 
+        // VALIDAZIONE DINAMICA: Verifica qualsiasi combinazione valida
         function checkWin() {
             let win = true;
-            puzzle.forEach((val, i) => {
-                const cell = document.getElementById(`cell-${i}`);
-                if(val !== 0) {
-                    if(val !== solution[i]) { cell.classList.add('error'); win = false; }
-                } else { win = false; }
+
+            for (let i = 0; i < 81; i++) {
+                if (puzzle[i] === 0) {
+                    win = false;
+                    break;
+                }
+            }
+
+            const errorCells = new Set();
+            for (let i = 0; i < 81; i++) {
+                let val = puzzle[i];
+                if (val === 0) continue;
+
+                let r = Math.floor(i / 9);
+                let c = i % 9;
+
+                for (let j = 0; j < 81; j++) {
+                    if (i === j) continue;
+                    let r2 = Math.floor(j / 9);
+                    let c2 = j % 9;
+                    let sameBlock = (Math.floor(r / 3) === Math.floor(r2 / 3)) && (Math.floor(c / 3) === Math.floor(c2 / 3));
+
+                    if ((r === r2 || c === c2 || sameBlock) && puzzle[j] === val) {
+                        errorCells.add(i);
+                        errorCells.add(j);
+                        win = false;
+                    }
+                }
+            }
+
+            document.querySelectorAll('.cell').forEach((cell, i) => {
+                if (errorCells.has(i)) {
+                    cell.classList.add('error');
+                } else {
+                    cell.classList.remove('error');
+                }
             });
-            
+
             if(win) { 
                 clearInterval(timerInterval); 
+                let bonus = currentDifficulty === 'easy' ? 300 : (currentDifficulty === 'medium' ? 500 : 800);
+
                 if (!hasWon) {
                     hasWon = true;
-                    savePoints(score + 800);
+                    savePoints(score + bonus);
                     let winsSudoku = parseInt(localStorage.getItem("wins_mastersudoku")) || 0;
                     localStorage.setItem("wins_mastersudoku", winsSudoku + 1);
-                    triggerGameWin('master-sudoku', 800);
+                    triggerGameWin('master-sudoku', bonus);
                 }
-                alert("MASTER! Tempo: " + document.getElementById('timer').innerText + "\n+800 💎 salvati!"); 
+
+                document.getElementById('win-time').innerText = "Tempo: " + document.getElementById('timer').innerText;
+                document.getElementById('win-bonus').innerText = `+${bonus} 💎 salvati!`;
+                document.getElementById('win-modal').classList.remove('hidden');
             }
+        }
+
+        function closeWinModal() {
+            document.getElementById('win-modal').classList.add('hidden');
+            initGame();
         }
 
         document.addEventListener('keydown', (e) => {
