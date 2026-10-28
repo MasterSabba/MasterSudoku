@@ -294,7 +294,7 @@
                 clearInterval(timerInterval); 
                 if (!hasWon) {
                     hasWon = true;
-                    savePoints(score + 100);
+                    savePoints(score + 500);
                     let winsSudoku = parseInt(localStorage.getItem("wins_mastersudoku")) || 0;
                     localStorage.setItem("wins_mastersudoku", winsSudoku + 1);
                     triggerGameWin('master-sudoku', 100);
