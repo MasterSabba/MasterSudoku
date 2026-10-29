@@ -34,7 +34,6 @@
         .header { margin-bottom: 6px; text-align: center; }
         h1 { color: var(--accent); margin: 0; font-size: 1.8rem; letter-spacing: 1px; }
         
-        /* Modalità Difficoltà Pulsanti */
         .diff-selector {
             display: flex; gap: 8px; justify-content: center; margin: 8px 0;
             width: 92vw; max-width: 440px;
@@ -111,7 +110,6 @@
         .btn-matita { background: #334155; color: white; border: 1px solid #475569; }
         .btn-matita.active { background: var(--accent); color: var(--bg); }
 
-        /* Pop-up di Vittoria */
         #win-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(2, 6, 23, 0.92); display: flex; flex-direction: column;
@@ -144,7 +142,6 @@
         </div>
     </div>
 
-    <!-- SELETTORE DIFFICOLTÀ -->
     <div class="diff-selector">
         <button class="btn-diff active" onclick="setDifficulty('easy', this)">Facile</button>
         <button class="btn-diff" onclick="setDifficulty('medium', this)">Media</button>
@@ -172,7 +169,6 @@
         <button onclick="initGame()" style="background: var(--success); color: var(--bg);">Nuovo</button>
     </div>
 
-    <!-- MODALE VITTORIA -->
     <div id="win-modal" class="hidden">
         <div class="modal-content">
             <h2>🎉 VITTORIA!</h2>
@@ -186,11 +182,9 @@
         let puzzle = [], notes = Array(81).fill().map(() => []);
         let selectedIdx = 0, noteMode = false, seconds = 0, timerInterval;
         let currentDifficulty = 'easy';
-        let userNick = localStorage.getItem('nickname') || localStorage.getItem('username') || "Player";
         
-        let score = parseInt(localStorage.getItem('points_mastersudoku')) || parseInt(localStorage.getItem('ms_score')) || 0;
-        localStorage.setItem('points_mastersudoku', score);
-        localStorage.setItem('ms_score', score);
+        let score = parseInt(localStorage.getItem('mp_score')) || parseInt(localStorage.getItem('ms_score')) || 0;
+        localStorage.setItem('mp_score', score);
         document.getElementById('pts').innerText = score;
         let hasWon = false;
 
@@ -199,21 +193,6 @@
             document.querySelectorAll('.btn-diff').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             initGame();
-        }
-
-        async function savePoints(newScore) {
-            score = newScore;
-            localStorage.setItem('points_mastersudoku', score);
-            localStorage.setItem('ms_score', score);
-            document.getElementById('pts').innerText = score;
-
-            try {
-                if (typeof db !== 'undefined') {
-                    await db.collection("users").doc(userNick).set({ MasterSudoku: score }, { merge: true });
-                }
-            } catch(e) {
-                console.error("Errore salvataggio Cloud:", e);
-            }
         }
 
         function triggerGameWin(gameKey, pointsGained) {
@@ -344,7 +323,6 @@
             btn.classList.toggle('active', noteMode);
         }
 
-        // VALIDAZIONE DINAMICA: Verifica qualsiasi combinazione valida
         function checkWin() {
             let win = true;
 
@@ -391,10 +369,10 @@
 
                 if (!hasWon) {
                     hasWon = true;
-                    savePoints(score + bonus);
-                    let winsSudoku = parseInt(localStorage.getItem("wins_mastersudoku")) || 0;
-                    localStorage.setItem("wins_mastersudoku", winsSudoku + 1);
-                    triggerGameWin('master-sudoku', bonus);
+                    score += bonus;
+                    localStorage.setItem('mp_score', score);
+                    document.getElementById('pts').innerText = score;
+                    triggerGameWin('sudoku', bonus);
                 }
 
                 document.getElementById('win-time').innerText = "Tempo: " + document.getElementById('timer').innerText;
